@@ -21,11 +21,12 @@ entries:
         url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
     apiVersion: v2
     appVersion: 4.7.4
-    created: "2026-05-22T19:10:58.495697+02:00"
+    created: "2026-05-22T17:11:48.814489604Z"
     description: Helm chart for Clair — container vulnerability static analysis tool
       (Quay/Red Hat)
-    digest: 42a7a7fdab79445aabe7a4d9cff9801a7883216a472d05dc714df528a79e45f6
+    digest: 51fd254ba563031dc5e8e831b5cd563749a275667e08a3ba5f213587c61b3de6
     home: https://github.com/hackertwinten/clair-helm
+    icon: https://raw.githubusercontent.com/hackertwinten/clair-helm/main/assets/logo.png
     keywords:
     - clair
     - vulnerability-scanner
@@ -42,4 +43,4 @@ entries:
     urls:
     - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.3.0/clair-0.3.0.tgz
     version: 0.3.0
-generated: "2026-05-22T19:10:58.49426+02:00"
+generated: "2026-05-22T17:11:48.813050234Z"
