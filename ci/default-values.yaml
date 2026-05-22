@@ -1,4 +1,4 @@
-# CI: default (deployment) mode with persistence disabled to avoid PVC provisioning
+# CI: default (combo) mode with persistence disabled to avoid PVC provisioning
 postgresql:
   persistence:
     enabled: false

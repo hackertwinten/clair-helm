@@ -1,4 +1,4 @@
-{{- if and (eq .Values.mode "combo") .Values.combo.notifier.enabled }}
+{{- if and (eq .Values.mode "distributed") .Values.distributed.notifier.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,13 +7,17 @@ metadata:
     {{- include "clair.labels" . | nindent 4 }}
     app.kubernetes.io/component: notifier
 spec:
-  type: {{ .Values.combo.notifier.service.type }}
+  type: ClusterIP
   selector:
     {{- include "clair.notifier.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: notifier
   ports:
     - name: http
-      port: {{ .Values.combo.notifier.service.port }}
+      port: 6060
       targetPort: http
+      protocol: TCP
+    - name: introspection
+      port: 8089
+      targetPort: introspection
       protocol: TCP
 {{- end }}

@@ -1,0 +1,8 @@
+# CI: distributed mode with persistence disabled to avoid PVC provisioning
+mode: distributed
+postgresql:
+  persistence:
+    enabled: false
+distributed:
+  ingress:
+    enabled: false

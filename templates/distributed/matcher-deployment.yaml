@@ -1,29 +1,29 @@
-{{- if eq .Values.mode "combo" }}
+{{- if eq .Values.mode "distributed" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "clair.fullname" . }}
+  name: {{ include "clair.fullname" . }}-matcher
   labels:
     {{- include "clair.labels" . | nindent 4 }}
-    app.kubernetes.io/component: combo
+    app.kubernetes.io/component: matcher
 spec:
-  {{- if not .Values.combo.autoscaling.enabled }}
-  replicas: {{ .Values.combo.replicaCount }}
+  {{- if not .Values.distributed.matcher.autoscaling.enabled }}
+  replicas: {{ .Values.distributed.matcher.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "clair.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: combo
+      {{- include "clair.matcher.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: matcher
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/distributed/secret.yaml") . | sha256sum }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
-        {{- include "clair.selectorLabels" . | nindent 8 }}
-        app.kubernetes.io/component: combo
+        {{- include "clair.matcher.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: matcher
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -35,14 +35,13 @@ spec:
       serviceAccountName: {{ include "clair.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.postgresql.enabled }}
       initContainers:
-        - name: wait-for-postgres
+        - name: wait-for-indexer
           image: busybox:1.36
           command:
             - sh
             - -c
-            - until nc -z {{ include "clair.postgresHost" . }} {{ .Values.postgresql.service.port }}; do echo "waiting for postgres"; sleep 2; done
+            - until nc -z {{ include "clair.fullname" . }}-indexer 6060; do echo "waiting for indexer"; sleep 2; done
           securityContext:
             runAsNonRoot: true
             runAsUser: 65534
@@ -50,15 +49,14 @@ spec:
             readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
-      {{- end }}
       containers:
-        - name: clair
+        - name: matcher
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/clair", "-conf", "/etc/clair/config.yaml"]
           env:
             - name: CLAIR_MODE
-              value: combo
+              value: matcher
           ports:
             - name: http
               containerPort: 6060
@@ -90,7 +88,7 @@ spec:
               readOnly: true
             - name: tmp
               mountPath: /tmp
-          {{- with .Values.combo.resources }}
+          {{- with .Values.distributed.matcher.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}

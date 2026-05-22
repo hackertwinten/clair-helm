@@ -1,4 +1,4 @@
-{{- if and (eq .Values.mode "deployment") .Values.pdb.enabled }}
+{{- if and (eq .Values.mode "combo") .Values.combo.pdb.enabled }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -6,9 +6,9 @@ metadata:
   labels:
     {{- include "clair.labels" . | nindent 4 }}
 spec:
-  minAvailable: {{ .Values.pdb.minAvailable }}
+  minAvailable: {{ .Values.combo.pdb.minAvailable }}
   selector:
     matchLabels:
       {{- include "clair.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: clair
+      app.kubernetes.io/component: combo
 {{- end }}

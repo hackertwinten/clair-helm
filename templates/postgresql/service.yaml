@@ -1,4 +1,4 @@
-{{- if and (eq .Values.mode "deployment") .Values.postgresql.enabled }}
+{{- if and (or (eq .Values.mode "combo") (eq .Values.mode "distributed")) .Values.postgresql.enabled }}
 apiVersion: v1
 kind: Service
 metadata:

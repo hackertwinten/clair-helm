@@ -1,11 +1,11 @@
-# -- Deployment mode: "deployment" (normal) or "operator"
-mode: deployment
+# -- Deployment mode: "combo" (all-in-one) or "distributed" (separate pods per component)
+mode: combo
 
 nameOverride: ""
 fullnameOverride: ""
 
 # ──────────────────────────────────────────────
-# Clair main (indexer + matcher, combo by default)
+# Clair image (shared across all modes)
 # ──────────────────────────────────────────────
 image:
   repository: quay.io/projectquay/clair
@@ -13,8 +13,6 @@ image:
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
-
-replicaCount: 1
 
 serviceAccount:
   create: true
@@ -35,54 +33,17 @@ securityContext:
   capabilities:
     drop: ["ALL"]
 
-service:
-  type: ClusterIP
-  port: 6060
-  introspectionPort: 8089
-
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-  hosts:
-    - host: clair.example.com
-      paths:
-        - path: /
-          pathType: Prefix
-  tls: []
-
-resources: {}
-  # requests:
-  #   cpu: 200m
-  #   memory: 512Mi
-  # limits:
-  #   cpu: 1000m
-  #   memory: 1Gi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 80
-
-pdb:
-  enabled: false
-  minAvailable: 1
-
 nodeSelector: {}
 tolerations: []
 affinity: {}
 
 # ──────────────────────────────────────────────
-# Clair configuration
+# Clair configuration (applied to all modes)
 # ──────────────────────────────────────────────
 config:
   logLevel: info
   httpListenAddr: "0.0.0.0:6060"
   introspectionAddr: "0.0.0.0:8089"
-  # combo = indexer + matcher + notifier in one process.
-  # Set to "indexer" or "matcher" for split deployments.
-  mode: combo
 
   indexer:
     scanLockRetry: 10
@@ -97,6 +58,17 @@ config:
     disableUpdaters: false
     updateRetention: 2
 
+  notifier:
+    migrations: true
+    pollInterval: "5m"
+    deliveryInterval: "1m"
+    webhook:
+      target: ""
+      callback: ""
+      signed: false
+    # amqp: {}
+    # stomp: {}
+
   # Optional PSK auth between Clair components
   auth: {}
     # psk:
@@ -107,7 +79,7 @@ config:
 # Database
 # ──────────────────────────────────────────────
 database:
-  # Set to use an external PostgreSQL; leave empty to use bundled postgresql.
+  # Full PostgreSQL DSN. Leave empty to use bundled postgresql.
   externalConnString: ""
   name: clair
   user: clair
@@ -115,7 +87,7 @@ database:
   password: ""
 
 # ──────────────────────────────────────────────
-# Bundled PostgreSQL
+# Bundled PostgreSQL (used by both modes)
 # ──────────────────────────────────────────────
 postgresql:
   enabled: true
@@ -146,59 +118,82 @@ postgresql:
     readOnlyRootFilesystem: false
 
 # ──────────────────────────────────────────────
-# Notifier (separate deployment, notifier mode)
+# Combo mode  (mode: combo)
+# Single process running indexer + matcher + optional separate notifier.
 # ──────────────────────────────────────────────
-notifier:
-  enabled: true
-
+combo:
   replicaCount: 1
-
-  config:
-    migrations: true
-    pollInterval: "5m"
-    deliveryInterval: "1m"
-    # Addresses of the indexer and matcher when running notifier separately.
-    # Defaults to the main Clair service if left empty.
-    indexerAddr: ""
-    matcherAddr: ""
-    webhook:
-      target: ""
-      callback: ""
-      signed: false
-    # amqp: {}
-    # stomp: {}
-
   resources: {}
-
-  podAnnotations: {}
 
   service:
     type: ClusterIP
     port: 6060
+    introspectionPort: 8089
 
-# ──────────────────────────────────────────────
-# Operator mode  (mode: operator)
-# ──────────────────────────────────────────────
-operator:
-  image:
-    repository: quay.io/projectquay/clair-operator
-    tag: "latest"
-    pullPolicy: IfNotPresent
-
-  replicaCount: 1
-  resources: {}
-
-  serviceAccount:
-    create: true
+  ingress:
+    enabled: false
+    className: ""
     annotations: {}
-    name: ""
+    hosts:
+      - host: clair.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
 
-  # When true, also create a ClairInstance CR for the operator to reconcile.
-  instance:
-    create: true
-    name: clair
-    # These mirror the top-level values and are passed into the CR spec.
-    replicas: 1
-    image: "quay.io/projectquay/clair:4.7.4"
-    database:
-      secretRef: ""  # name of a pre-existing Secret with key "connstring"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+
+  pdb:
+    enabled: false
+    minAvailable: 1
+
+  # Deploy a separate notifier pod (CLAIR_MODE=notifier).
+  # When disabled, notifier runs inside the main combo process.
+  notifier:
+    enabled: true
+    replicaCount: 1
+    resources: {}
+    service:
+      type: ClusterIP
+      port: 6060
+
+# ──────────────────────────────────────────────
+# Distributed mode  (mode: distributed)
+# Separate Deployment per component with path-based Ingress routing.
+# Requires a Layer 7 ingress controller.
+# ──────────────────────────────────────────────
+distributed:
+  # Ingress is effectively required in distributed mode.
+  ingress:
+    enabled: true
+    className: ""
+    annotations: {}
+    host: clair.example.com
+    tls: []
+
+  indexer:
+    replicaCount: 2
+    resources: {}
+    autoscaling:
+      enabled: false
+      minReplicas: 2
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+
+  matcher:
+    replicaCount: 2
+    resources: {}
+    autoscaling:
+      enabled: false
+      minReplicas: 2
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+
+  notifier:
+    enabled: true
+    replicaCount: 1
+    resources: {}

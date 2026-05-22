@@ -9,8 +9,8 @@ Helm chart for deploying [Clair](https://github.com/quay/clair) — the open-sou
 
 Supports two deployment modes:
 
-- **`deployment`** (default) — deploys Clair directly as Kubernetes resources (Deployment, Service, Secret, etc.)
-- **`operator`** — installs a CRD (`ClairInstance`) and an operator controller that reconciles it
+- **`combo`** (default) — single all-in-one Clair process running indexer + matcher, with an optional separate notifier pod
+- **`distributed`** — separate Deployment per component (indexer, matcher, notifier) with path-based Ingress routing
 
 ## Contents
 
@@ -18,7 +18,7 @@ Supports two deployment modes:
 - [Installation](#installation)
 - [Deployment modes](#deployment-modes)
 - [Configuration](#configuration)
-- [Components](#components)
+- [Values reference](#values-reference)
 - [Upgrading](#upgrading)
 - [Uninstalling](#uninstalling)
 
@@ -29,6 +29,7 @@ Supports two deployment modes:
 - Kubernetes 1.24+
 - Helm 3.10+
 - `kubectl` configured against your cluster
+- For distributed mode: a Layer 7 Ingress controller (nginx, traefik, etc.)
 
 ---
 
@@ -57,7 +58,7 @@ helm status clair -n clair
 kubectl get pods -n clair
 ```
 
-Port-forward to access the API locally:
+Port-forward to access the API locally (combo mode):
 
 ```bash
 kubectl port-forward -n clair svc/clair 6060:6060
@@ -68,9 +69,9 @@ curl http://localhost:6060/api/v1/index_report
 
 ## Deployment modes
 
-### Normal deployment (default)
+### Combo mode (default)
 
-Deploys all Clair components as standard Kubernetes resources. Best for most use cases.
+Runs all Clair components in a single process (`CLAIR_MODE=combo`). An optional second pod can handle notifications independently.
 
 ```bash
 helm install clair ./clair-helm -n clair --create-namespace
@@ -80,38 +81,46 @@ Resources created:
 
 | Resource | Description |
 |---|---|
-| `Deployment/clair` | Clair main process (`combo` mode by default) |
-| `Deployment/clair-notifier` | Dedicated notifier process (`notifier` mode) |
+| `Deployment/clair` | Clair main process in `combo` mode |
+| `Deployment/clair-notifier` | Dedicated notifier pod (`combo.notifier.enabled=true`) |
 | `Deployment/clair-postgresql` | Bundled PostgreSQL 15 |
-| `Service/clair` | ClusterIP on port 6060 (HTTP) and 8089 (introspection) |
+| `Service/clair` | ClusterIP on port 6060 and 8089 |
 | `Service/clair-notifier` | ClusterIP for the notifier |
 | `Service/clair-postgresql` | ClusterIP for Postgres |
 | `Secret/clair-db` | Database password (auto-generated) |
-| `Secret/clair-config` | Full Clair config YAML (contains credentials) |
-| `Secret/clair-notifier-config` | Notifier-mode config YAML |
+| `Secret/clair-config` | Clair config YAML |
 | `PersistentVolumeClaim/clair-postgresql` | 10Gi data volume |
 
-### Operator mode
+### Distributed mode
 
-Installs the `ClairInstance` CRD, the operator controller, and (optionally) a `ClairInstance` CR. The operator reconciles the CR into the actual Clair resources.
+Runs each Clair component as its own Deployment. Requires a Layer 7 Ingress controller to route requests by path.
 
 ```bash
 helm install clair ./clair-helm -n clair --create-namespace \
-  --set mode=operator
+  --set mode=distributed \
+  --set distributed.ingress.enabled=true \
+  --set distributed.ingress.className=nginx \
+  --set distributed.ingress.host=clair.example.com
 ```
 
 Resources created:
 
 | Resource | Description |
 |---|---|
-| `CustomResourceDefinition/clairinstances.clair.quay.io` | ClairInstance CRD |
-| `Deployment/clair-operator` | Operator controller |
-| `ClusterRole/clair-operator` | RBAC for the operator |
-| `ClusterRoleBinding/clair-operator` | Binds the role to the operator SA |
-| `ServiceAccount/clair-operator` | Operator service account |
-| `ClairInstance/clair` | Instance CR (if `operator.instance.create=true`) |
+| `Deployment/clair-indexer` | Indexer component |
+| `Deployment/clair-matcher` | Matcher component |
+| `Deployment/clair-notifier` | Notifier component (if enabled) |
+| `Service/clair-indexer` | ClusterIP for indexer |
+| `Service/clair-matcher` | ClusterIP for matcher |
+| `Service/clair-notifier` | ClusterIP for notifier |
+| `Ingress/clair` | Routes `/indexer`, `/matcher`, `/notifier` to each service |
+| `Deployment/clair-postgresql` | Bundled PostgreSQL 15 |
+| `Secret/clair-config` | Shared Clair config YAML |
 
-> **Note:** The operator image (`operator.image.repository`) must be a controller that understands the `ClairInstance` CRD defined in this chart. The default `quay.io/projectquay/clair-operator` is a placeholder — replace it with your actual operator image.
+The Ingress routes traffic by path prefix:
+- `clair.example.com/indexer/*` → indexer
+- `clair.example.com/matcher/*` → matcher
+- `clair.example.com/notifier/*` → notifier
 
 ---
 
@@ -139,43 +148,59 @@ helm install clair ./clair-helm -n clair --create-namespace \
 ### Disable the notifier
 
 ```bash
+# Combo mode
 helm install clair ./clair-helm -n clair --create-namespace \
-  --set notifier.enabled=false
+  --set combo.notifier.enabled=false
+
+# Distributed mode
+helm install clair ./clair-helm -n clair --create-namespace \
+  --set mode=distributed \
+  --set distributed.notifier.enabled=false
 ```
 
-When `notifier.enabled=false` and `config.mode=combo`, the main Clair process handles notifications internally.
-
-### Enable ingress
+### Enable Ingress (combo mode)
 
 ```bash
 helm install clair ./clair-helm -n clair --create-namespace \
-  --set ingress.enabled=true \
-  --set ingress.className=nginx \
-  --set "ingress.hosts[0].host=clair.example.com" \
-  --set "ingress.hosts[0].paths[0].path=/" \
-  --set "ingress.hosts[0].paths[0].pathType=Prefix"
+  --set combo.ingress.enabled=true \
+  --set combo.ingress.className=nginx \
+  --set "combo.ingress.hosts[0].host=clair.example.com" \
+  --set "combo.ingress.hosts[0].paths[0].path=/" \
+  --set "combo.ingress.hosts[0].paths[0].pathType=Prefix"
 ```
 
-### Enable HPA
+### Enable HPA (combo mode)
 
 ```bash
 helm install clair ./clair-helm -n clair --create-namespace \
-  --set autoscaling.enabled=true \
-  --set autoscaling.minReplicas=2 \
-  --set autoscaling.maxReplicas=5
+  --set combo.autoscaling.enabled=true \
+  --set combo.autoscaling.minReplicas=2 \
+  --set combo.autoscaling.maxReplicas=5
+```
+
+### Enable per-component HPA (distributed mode)
+
+```bash
+helm install clair ./clair-helm -n clair --create-namespace \
+  --set mode=distributed \
+  --set distributed.indexer.autoscaling.enabled=true \
+  --set distributed.indexer.autoscaling.maxReplicas=10 \
+  --set distributed.matcher.autoscaling.enabled=true \
+  --set distributed.matcher.autoscaling.maxReplicas=10
 ```
 
 ### Set resource limits
 
 ```yaml
 # custom-values.yaml
-resources:
-  requests:
-    cpu: 200m
-    memory: 512Mi
-  limits:
-    cpu: 1000m
-    memory: 1Gi
+combo:
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
 
 postgresql:
   resources:
@@ -187,16 +212,12 @@ postgresql:
       memory: 512Mi
 ```
 
-```bash
-helm install clair ./clair-helm -n clair --create-namespace -f custom-values.yaml
-```
-
 ### Configure webhook notifications
 
 ```yaml
 # custom-values.yaml
-notifier:
-  config:
+config:
+  notifier:
     webhook:
       target: "https://my-webhook.example.com/clair"
       callback: "http://clair:6060/notifier/api/v1/notifications"
@@ -211,34 +232,21 @@ notifier:
 
 | Key | Default | Description |
 |---|---|---|
-| `mode` | `deployment` | Deployment mode: `deployment` or `operator` |
+| `mode` | `combo` | Deployment mode: `combo` or `distributed` |
 | `nameOverride` | `""` | Override the chart name |
 | `fullnameOverride` | `""` | Override the full release name |
-
-### Clair
-
-| Key | Default | Description |
-|---|---|---|
 | `image.repository` | `quay.io/projectquay/clair` | Clair image |
-| `image.tag` | `4.7.4` | Image tag (defaults to `appVersion`) |
-| `replicaCount` | `1` | Number of Clair replicas |
-| `config.mode` | `combo` | Clair process mode: `combo`, `indexer`, `matcher` |
+| `image.tag` | `""` | Image tag (defaults to `appVersion`) |
 | `config.logLevel` | `info` | Log level: `debug`, `info`, `warn`, `error` |
 | `config.indexer.migrations` | `true` | Run DB migrations on startup |
 | `config.matcher.period` | `6h` | How often to sync vulnerability data |
 | `config.matcher.disableUpdaters` | `false` | Disable vulnerability feed updates |
-| `service.type` | `ClusterIP` | Service type |
-| `service.port` | `6060` | HTTP API port |
-| `service.introspectionPort` | `8089` | Metrics/health port |
-| `ingress.enabled` | `false` | Enable Ingress |
-| `autoscaling.enabled` | `false` | Enable HPA |
-| `pdb.enabled` | `false` | Enable PodDisruptionBudget |
 
 ### Database
 
 | Key | Default | Description |
 |---|---|---|
-| `database.externalConnString` | `""` | Full PostgreSQL connection string (disables bundled Postgres) |
+| `database.externalConnString` | `""` | Full PostgreSQL DSN (disables bundled Postgres) |
 | `database.name` | `clair` | Database name |
 | `database.user` | `clair` | Database user |
 | `database.password` | `""` | Password (auto-generated if empty) |
@@ -253,49 +261,36 @@ notifier:
 | `postgresql.persistence.size` | `10Gi` | PVC size |
 | `postgresql.persistence.storageClass` | `""` | Storage class (cluster default if empty) |
 
-### Notifier
+### Combo mode
 
 | Key | Default | Description |
 |---|---|---|
-| `notifier.enabled` | `true` | Deploy a dedicated notifier pod |
-| `notifier.replicaCount` | `1` | Number of notifier replicas |
-| `notifier.config.pollInterval` | `5m` | How often to poll for new notifications |
-| `notifier.config.deliveryInterval` | `1m` | How often to attempt delivery |
-| `notifier.config.indexerAddr` | `""` | Indexer address (defaults to main Clair service) |
-| `notifier.config.matcherAddr` | `""` | Matcher address (defaults to main Clair service) |
-| `notifier.config.webhook.target` | `""` | Webhook delivery URL |
-| `notifier.config.webhook.callback` | `""` | Callback URL for the notifier |
+| `combo.replicaCount` | `1` | Number of Clair replicas |
+| `combo.service.type` | `ClusterIP` | Service type |
+| `combo.service.port` | `6060` | HTTP API port |
+| `combo.ingress.enabled` | `false` | Enable Ingress |
+| `combo.autoscaling.enabled` | `false` | Enable HPA |
+| `combo.pdb.enabled` | `false` | Enable PodDisruptionBudget |
+| `combo.notifier.enabled` | `true` | Deploy a dedicated notifier pod |
+| `combo.notifier.replicaCount` | `1` | Notifier replicas |
 
-### Operator mode
+### Distributed mode
 
 | Key | Default | Description |
 |---|---|---|
-| `operator.image.repository` | `quay.io/projectquay/clair-operator` | Operator image |
-| `operator.image.tag` | `latest` | Operator image tag |
-| `operator.replicaCount` | `1` | Operator replicas (leader election handles >1) |
-| `operator.instance.create` | `true` | Create a `ClairInstance` CR on install |
-| `operator.instance.name` | `clair` | Name of the `ClairInstance` CR |
-| `operator.instance.replicas` | `1` | Desired Clair replicas in the CR spec |
-| `operator.instance.database.secretRef` | `""` | Pre-existing Secret with `connstring` key |
+| `distributed.ingress.enabled` | `true` | Enable path-based Ingress (required for external access) |
+| `distributed.ingress.host` | `clair.example.com` | Ingress hostname |
+| `distributed.ingress.className` | `""` | Ingress class name |
+| `distributed.indexer.replicaCount` | `2` | Indexer replicas |
+| `distributed.indexer.autoscaling.enabled` | `false` | Enable HPA for indexer |
+| `distributed.matcher.replicaCount` | `2` | Matcher replicas |
+| `distributed.matcher.autoscaling.enabled` | `false` | Enable HPA for matcher |
+| `distributed.notifier.enabled` | `true` | Deploy notifier |
+| `distributed.notifier.replicaCount` | `1` | Notifier replicas |
 
 ---
 
-## Components
-
-### Clair modes
-
-Clair v4 supports four operating modes set via `CLAIR_MODE` (or `config.mode`):
-
-| Mode | Description |
-|---|---|
-| `combo` | Runs indexer + matcher + notifier in one process. Best for small/medium deployments. |
-| `indexer` | Fetches and indexes container layer data. |
-| `matcher` | Matches indexed packages against vulnerability feeds. |
-| `notifier` | Watches for new vulnerabilities and delivers notifications. |
-
-This chart runs the main pod in `combo` mode by default. When `notifier.enabled=true`, a separate pod is deployed in `notifier` mode for independent scaling, while the main pod continues in `combo` mode.
-
-### Security
+## Security
 
 All pods run with:
 - `runAsNonRoot: true`
@@ -323,13 +318,7 @@ The database password is preserved across upgrades — the chart uses `lookup` t
 helm uninstall clair -n clair
 ```
 
-> **Note:** The `ClairInstance` CRD (operator mode) has `helm.sh/resource-policy: keep` and will **not** be deleted automatically. Remove it manually if no longer needed:
->
-> ```bash
-> kubectl delete crd clairinstances.clair.quay.io
-> ```
-
-The PostgreSQL PVC is also retained by default Kubernetes behavior. Delete it manually to free storage:
+The PostgreSQL PVC is retained by default Kubernetes behavior. Delete it manually to free storage:
 
 ```bash
 kubectl delete pvc clair-postgresql -n clair

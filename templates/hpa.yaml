@@ -1,4 +1,4 @@
-{{- if and (eq .Values.mode "deployment") .Values.autoscaling.enabled }}
+{{- if and (eq .Values.mode "combo") .Values.combo.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -10,13 +10,13 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "clair.fullname" . }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  minReplicas: {{ .Values.combo.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.combo.autoscaling.maxReplicas }}
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+          averageUtilization: {{ .Values.combo.autoscaling.targetCPUUtilizationPercentage }}
 {{- end }}

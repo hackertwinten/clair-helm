@@ -1,29 +1,29 @@
-{{- if eq .Values.mode "combo" }}
+{{- if eq .Values.mode "distributed" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "clair.fullname" . }}
+  name: {{ include "clair.fullname" . }}-indexer
   labels:
     {{- include "clair.labels" . | nindent 4 }}
-    app.kubernetes.io/component: combo
+    app.kubernetes.io/component: indexer
 spec:
-  {{- if not .Values.combo.autoscaling.enabled }}
-  replicas: {{ .Values.combo.replicaCount }}
+  {{- if not .Values.distributed.indexer.autoscaling.enabled }}
+  replicas: {{ .Values.distributed.indexer.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "clair.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: combo
+      {{- include "clair.indexer.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: indexer
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/distributed/secret.yaml") . | sha256sum }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
-        {{- include "clair.selectorLabels" . | nindent 8 }}
-        app.kubernetes.io/component: combo
+        {{- include "clair.indexer.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: indexer
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -52,13 +52,13 @@ spec:
               drop: ["ALL"]
       {{- end }}
       containers:
-        - name: clair
+        - name: indexer
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/clair", "-conf", "/etc/clair/config.yaml"]
           env:
             - name: CLAIR_MODE
-              value: combo
+              value: indexer
           ports:
             - name: http
               containerPort: 6060
@@ -90,7 +90,7 @@ spec:
               readOnly: true
             - name: tmp
               mountPath: /tmp
-          {{- with .Values.combo.resources }}
+          {{- with .Values.distributed.indexer.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}

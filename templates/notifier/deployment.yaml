@@ -1,4 +1,4 @@
-{{- if and (eq .Values.mode "deployment") .Values.notifier.enabled }}
+{{- if and (eq .Values.mode "combo") .Values.combo.notifier.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,7 +7,7 @@ metadata:
     {{- include "clair.labels" . | nindent 4 }}
     app.kubernetes.io/component: notifier
 spec:
-  replicas: {{ .Values.notifier.replicaCount }}
+  replicas: {{ .Values.combo.notifier.replicaCount }}
   selector:
     matchLabels:
       {{- include "clair.notifier.selectorLabels" . | nindent 6 }}
@@ -16,7 +16,7 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-        {{- with .Values.notifier.podAnnotations }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
@@ -37,7 +37,7 @@ spec:
             - sh
             - -c
             - |
-              until nc -z {{ include "clair.fullname" . }} {{ .Values.service.port }}; do
+              until nc -z {{ include "clair.fullname" . }} {{ .Values.combo.service.port }}; do
                 echo "Waiting for Clair..."; sleep 2
               done
           securityContext:
@@ -60,7 +60,7 @@ spec:
               value: notifier
           ports:
             - name: http
-              containerPort: {{ .Values.notifier.service.port }}
+              containerPort: {{ .Values.combo.notifier.service.port }}
               protocol: TCP
             - name: introspection
               containerPort: 8089
@@ -88,7 +88,7 @@ spec:
               readOnly: true
             - name: tmp
               mountPath: /tmp
-          {{- with .Values.notifier.resources }}
+          {{- with .Values.combo.notifier.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
