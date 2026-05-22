@@ -1,0 +1,175 @@
+{{- if eq .Values.mode "operator" }}
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: clairinstances.clair.quay.io
+  labels:
+    {{- include "clair.labels" . | nindent 4 }}
+  annotations:
+    # Keep the CRD on helm uninstall so data is not lost.
+    "helm.sh/resource-policy": keep
+spec:
+  group: clair.quay.io
+  names:
+    kind: ClairInstance
+    listKind: ClairInstanceList
+    plural: clairinstances
+    singular: clairinstance
+    shortNames:
+      - ci
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Replicas
+          type: integer
+          jsonPath: .spec.replicas
+        - name: Image
+          type: string
+          jsonPath: .spec.image
+        - name: Ready
+          type: string
+          jsonPath: .status.ready
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                replicas:
+                  type: integer
+                  minimum: 1
+                  default: 1
+                  description: Number of Clair replicas.
+                image:
+                  type: string
+                  description: Clair container image.
+                  default: "quay.io/projectquay/clair:4.7.4"
+                mode:
+                  type: string
+                  enum: [combo, indexer, matcher]
+                  default: combo
+                  description: Clair operating mode.
+                config:
+                  type: object
+                  description: Clair application configuration.
+                  properties:
+                    logLevel:
+                      type: string
+                      enum: [debug, info, warn, error]
+                      default: info
+                    httpListenAddr:
+                      type: string
+                      default: "0.0.0.0:6060"
+                    introspectionAddr:
+                      type: string
+                      default: "0.0.0.0:8089"
+                    indexer:
+                      type: object
+                      properties:
+                        migrations:
+                          type: boolean
+                          default: true
+                        scanLockRetry:
+                          type: integer
+                          default: 10
+                        layerScanConcurrency:
+                          type: integer
+                          default: 5
+                    matcher:
+                      type: object
+                      properties:
+                        migrations:
+                          type: boolean
+                          default: true
+                        maxConnPool:
+                          type: integer
+                          default: 100
+                        period:
+                          type: string
+                          default: "6h"
+                database:
+                  type: object
+                  description: Database configuration.
+                  properties:
+                    secretRef:
+                      type: string
+                      description: Name of a Secret containing key 'connstring'.
+                    name:
+                      type: string
+                      default: clair
+                    user:
+                      type: string
+                      default: clair
+                    passwordSecretRef:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                notifier:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                      default: true
+                    replicas:
+                      type: integer
+                      minimum: 1
+                      default: 1
+                    pollInterval:
+                      type: string
+                      default: "5m"
+                    deliveryInterval:
+                      type: string
+                      default: "1m"
+                    webhook:
+                      type: object
+                      properties:
+                        target:
+                          type: string
+                        callback:
+                          type: string
+                resources:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                  description: Resource requests/limits for Clair pods.
+                ingress:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                      default: false
+                    className:
+                      type: string
+                    host:
+                      type: string
+                    tls:
+                      type: array
+                      items:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              properties:
+                ready:
+                  type: string
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                observedGeneration:
+                  type: integer
+                message:
+                  type: string
+{{- end }}

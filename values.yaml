@@ -1,0 +1,204 @@
+# -- Deployment mode: "deployment" (normal) or "operator"
+mode: deployment
+
+nameOverride: ""
+fullnameOverride: ""
+
+# ──────────────────────────────────────────────
+# Clair main (indexer + matcher, combo by default)
+# ──────────────────────────────────────────────
+image:
+  repository: quay.io/projectquay/clair
+  tag: "4.7.4"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+replicaCount: 1
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  fsGroup: 65534
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+service:
+  type: ClusterIP
+  port: 6060
+  introspectionPort: 8089
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: clair.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources: {}
+  # requests:
+  #   cpu: 200m
+  #   memory: 512Mi
+  # limits:
+  #   cpu: 1000m
+  #   memory: 1Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+pdb:
+  enabled: false
+  minAvailable: 1
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# ──────────────────────────────────────────────
+# Clair configuration
+# ──────────────────────────────────────────────
+config:
+  logLevel: info
+  httpListenAddr: "0.0.0.0:6060"
+  introspectionAddr: "0.0.0.0:8089"
+  # combo = indexer + matcher + notifier in one process.
+  # Set to "indexer" or "matcher" for split deployments.
+  mode: combo
+
+  indexer:
+    scanLockRetry: 10
+    layerScanConcurrency: 5
+    migrations: true
+    airgap: false
+
+  matcher:
+    maxConnPool: 100
+    migrations: true
+    period: "6h"
+    disableUpdaters: false
+    updateRetention: 2
+
+  # Optional PSK auth between Clair components
+  auth: {}
+    # psk:
+    #   key: "changeme"
+    #   iss: ["indexer", "matcher"]
+
+# ──────────────────────────────────────────────
+# Database
+# ──────────────────────────────────────────────
+database:
+  # Set to use an external PostgreSQL; leave empty to use bundled postgresql.
+  externalConnString: ""
+  name: clair
+  user: clair
+  # Leave empty to auto-generate. Persisted across upgrades via Secret lookup.
+  password: ""
+
+# ──────────────────────────────────────────────
+# Bundled PostgreSQL
+# ──────────────────────────────────────────────
+postgresql:
+  enabled: true
+
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+
+  resources: {}
+
+  service:
+    port: 5432
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    fsGroup: 999
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+
+# ──────────────────────────────────────────────
+# Notifier (separate deployment, notifier mode)
+# ──────────────────────────────────────────────
+notifier:
+  enabled: true
+
+  replicaCount: 1
+
+  config:
+    migrations: true
+    pollInterval: "5m"
+    deliveryInterval: "1m"
+    # Addresses of the indexer and matcher when running notifier separately.
+    # Defaults to the main Clair service if left empty.
+    indexerAddr: ""
+    matcherAddr: ""
+    webhook:
+      target: ""
+      callback: ""
+      signed: false
+    # amqp: {}
+    # stomp: {}
+
+  resources: {}
+
+  podAnnotations: {}
+
+  service:
+    type: ClusterIP
+    port: 6060
+
+# ──────────────────────────────────────────────
+# Operator mode  (mode: operator)
+# ──────────────────────────────────────────────
+operator:
+  image:
+    repository: quay.io/projectquay/clair-operator
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+  resources: {}
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: ""
+
+  # When true, also create a ClairInstance CR for the operator to reconcile.
+  instance:
+    create: true
+    name: clair
+    # These mirror the top-level values and are passed into the CR spec.
+    replicas: 1
+    image: "quay.io/projectquay/clair:4.7.4"
+    database:
+      secretRef: ""  # name of a pre-existing Secret with key "connstring"

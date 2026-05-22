@@ -1,0 +1,34 @@
+apiVersion: v2
+name: clair
+description: Helm chart for Clair — container vulnerability static analysis tool (Quay/Red Hat)
+type: application
+version: 0.1.0
+appVersion: "4.7.4"
+keywords:
+  - clair
+  - vulnerability-scanner
+  - container-security
+  - security
+home: https://github.com/hackertwinten/clair-helm
+sources:
+  - https://github.com/hackertwinten/clair-helm
+  - https://github.com/quay/clair
+maintainers:
+  - name: hackertwinten
+    url: https://github.com/hackertwinten
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/signKey: |
+    fingerprint: ""
+    url: ""
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial release with deployment and operator modes
+  artifacthub.io/images: |
+    - name: clair
+      image: quay.io/projectquay/clair:4.7.4
+    - name: postgresql
+      image: postgres:15-alpine
+  artifacthub.io/maintainers: |
+    - name: hackertwinten
+      url: https://github.com/hackertwinten

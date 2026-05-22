@@ -1,0 +1,17 @@
+# Patterns to ignore when building the Helm package.
+.git/
+.gitignore
+.github/
+ci/
+ct.yaml
+CONTRIBUTING.md
+CHANGELOG.md
+SECURITY.md
+CODE_OF_CONDUCT.md
+*.tgz
+.cr-release-packages/
+.DS_Store
+*.swp
+*.swo
+local-values.yaml
+secrets.yaml

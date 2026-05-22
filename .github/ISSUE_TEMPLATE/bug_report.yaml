@@ -1,0 +1,81 @@
+name: Bug Report
+description: Report a problem with the chart
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill in as much detail as possible.
+
+  - type: input
+    id: chart-version
+    attributes:
+      label: Chart version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: helm-version
+    attributes:
+      label: Helm version
+      placeholder: "v3.14.0"
+    validations:
+      required: true
+
+  - type: input
+    id: k8s-version
+    attributes:
+      label: Kubernetes version
+      placeholder: "v1.29.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Deployment mode
+      options:
+        - deployment (default)
+        - operator
+    validations:
+      required: true
+
+  - type: textarea
+    id: values
+    attributes:
+      label: Relevant values overrides
+      description: Paste the relevant parts of your values file. Remove any secrets.
+      render: yaml
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. helm install clair . --set ...
+        2. kubectl get pods ...
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or error output
+      render: shell
