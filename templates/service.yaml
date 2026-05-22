@@ -1,0 +1,23 @@
+{{- if eq .Values.mode "deployment" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clair.fullname" . }}
+  labels:
+    {{- include "clair.labels" . | nindent 4 }}
+    app.kubernetes.io/component: clair
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "clair.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: clair
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+    - name: introspection
+      port: {{ .Values.service.introspectionPort }}
+      targetPort: introspection
+      protocol: TCP
+{{- end }}

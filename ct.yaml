@@ -1,0 +1,3 @@
+remote: origin
+target-branch: main
+helm-extra-args: --timeout 300s

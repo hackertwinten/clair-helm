@@ -1,0 +1,53 @@
+{{- if and (eq .Values.mode "operator") .Values.operator.instance.create }}
+apiVersion: clair.quay.io/v1alpha1
+kind: ClairInstance
+metadata:
+  name: {{ .Values.operator.instance.name }}
+  labels:
+    {{- include "clair.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.operator.instance.replicas }}
+  image: {{ .Values.operator.instance.image | quote }}
+  mode: {{ .Values.config.mode }}
+  config:
+    logLevel: {{ .Values.config.logLevel }}
+    httpListenAddr: {{ .Values.config.httpListenAddr | quote }}
+    introspectionAddr: {{ .Values.config.introspectionAddr | quote }}
+    indexer:
+      migrations: {{ .Values.config.indexer.migrations }}
+      scanLockRetry: {{ .Values.config.indexer.scanLockRetry }}
+      layerScanConcurrency: {{ .Values.config.indexer.layerScanConcurrency }}
+    matcher:
+      migrations: {{ .Values.config.matcher.migrations }}
+      maxConnPool: {{ .Values.config.matcher.maxConnPool }}
+      period: {{ .Values.config.matcher.period | quote }}
+  database:
+    {{- if .Values.operator.instance.database.secretRef }}
+    secretRef: {{ .Values.operator.instance.database.secretRef | quote }}
+    {{- else }}
+    name: {{ .Values.database.name | quote }}
+    user: {{ .Values.database.user | quote }}
+    {{- end }}
+  notifier:
+    enabled: {{ .Values.notifier.enabled }}
+    replicas: {{ .Values.notifier.replicaCount }}
+    pollInterval: {{ .Values.notifier.config.pollInterval | quote }}
+    deliveryInterval: {{ .Values.notifier.config.deliveryInterval | quote }}
+    {{- if .Values.notifier.config.webhook.target }}
+    webhook:
+      target: {{ .Values.notifier.config.webhook.target | quote }}
+      callback: {{ .Values.notifier.config.webhook.callback | quote }}
+    {{- end }}
+  {{- with .Values.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  ingress:
+    enabled: {{ .Values.ingress.enabled }}
+    {{- if .Values.ingress.enabled }}
+    className: {{ .Values.ingress.className | quote }}
+    {{- if .Values.ingress.hosts }}
+    host: {{ (first .Values.ingress.hosts).host | quote }}
+    {{- end }}
+    {{- end }}
+{{- end }}
