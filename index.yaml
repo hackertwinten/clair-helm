@@ -3,6 +3,49 @@ entries:
   clair:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: Replace operator mode with proper distributed mode (separate indexer/matcher/notifier pods)
+        - kind: changed
+          description: Rename deployment mode to combo mode matching Clair upstream terminology
+        - kind: added
+          description: Path-based Ingress for distributed mode routing traffic to each component
+      artifacthub.io/images: |
+        - name: clair
+          image: quay.io/projectquay/clair:4.7.4
+        - name: postgresql
+          image: postgres:15-alpine
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/maintainers: |
+        - name: hackertwinten
+          url: https://github.com/hackertwinten
+      artifacthub.io/signKey: |
+        fingerprint: ""
+        url: ""
+    apiVersion: v2
+    appVersion: 4.7.4
+    created: "2026-05-22T16:09:25.142569391Z"
+    description: Helm chart for Clair — container vulnerability static analysis tool
+      (Quay/Red Hat)
+    digest: 98742b5899e71dbeea974add670f824b38567ae30212e7d19d39ba1ee116b99b
+    home: https://github.com/hackertwinten/clair-helm
+    keywords:
+    - clair
+    - vulnerability-scanner
+    - container-security
+    - security
+    maintainers:
+    - name: hackertwinten
+      url: https://github.com/hackertwinten
+    name: clair
+    sources:
+    - https://github.com/hackertwinten/clair-helm
+    - https://github.com/quay/clair
+    type: application
+    urls:
+    - https://hackertwinten.github.io/clair-helm/clair-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: Initial release with deployment and operator modes
       artifacthub.io/images: |
@@ -40,4 +83,4 @@ entries:
     urls:
     - https://hackertwinten.github.io/clair-helm/clair-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-22T15:48:48.691252744Z"
+generated: "2026-05-22T16:09:25.141392124Z"
