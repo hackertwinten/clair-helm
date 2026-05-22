@@ -21,14 +21,26 @@ jobs:
         with:
           version: v3.14.4
 
+      - name: Import GPG key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --batch --import
+          # helm sign requires the legacy secring.gpg format
+          gpg --export-secret-keys >~/.gnupg/secring.gpg
+
       - name: Get chart version
         id: chart
         run: |
           echo "version=$(helm show chart . | grep '^version:' | awk '{print $2}')" >> "$GITHUB_OUTPUT"
           echo "name=$(helm show chart . | grep '^name:' | awk '{print $2}')" >> "$GITHUB_OUTPUT"
 
-      - name: Package chart
-        run: helm package . --destination .packages
+      - name: Package and sign chart
+        run: |
+          helm package . --destination .packages \
+            --sign \
+            --key "hackertwinten" \
+            --keyring ~/.gnupg/secring.gpg
 
       - name: Create GitHub Release (skip if exists)
         env:
@@ -40,7 +52,7 @@ jobs:
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" &>/dev/null; then
             echo "Release $TAG already exists, skipping."
           else
-            gh release create "$TAG" .packages/*.tgz \
+            gh release create "$TAG" .packages/*.tgz .packages/*.prov \
               --title "$TAG" \
               --notes "Helm chart ${CHART_NAME} version ${CHART_VERSION}"
           fi

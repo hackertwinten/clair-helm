@@ -19,8 +19,8 @@ maintainers:
 annotations:
   artifacthub.io/license: Apache-2.0
   artifacthub.io/signKey: |
-    fingerprint: ""
-    url: ""
+    fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
+    url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
   artifacthub.io/changes: |
     - kind: changed
       description: Replace operator mode with proper distributed mode (separate indexer/matcher/notifier pods)
