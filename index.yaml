@@ -3,6 +3,47 @@ entries:
   clair:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: helm test support — health check Pods for combo and distributed modes
+        - kind: added
+          description: GPG-signed chart releases with public key published in repo
+      artifacthub.io/images: |
+        - name: clair
+          image: quay.io/projectquay/clair:4.7.4
+        - name: postgresql
+          image: postgres:15-alpine
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/maintainers: |
+        - name: hackertwinten
+          url: https://github.com/hackertwinten
+      artifacthub.io/signKey: |
+        fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
+        url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
+    apiVersion: v2
+    appVersion: 4.7.4
+    created: "2026-05-22T16:33:47.926480554Z"
+    description: Helm chart for Clair — container vulnerability static analysis tool
+      (Quay/Red Hat)
+    digest: 42a7a7fdab79445aabe7a4d9cff9801a7883216a472d05dc714df528a79e45f6
+    home: https://github.com/hackertwinten/clair-helm
+    keywords:
+    - clair
+    - vulnerability-scanner
+    - container-security
+    - security
+    maintainers:
+    - name: hackertwinten
+      url: https://github.com/hackertwinten
+    name: clair
+    sources:
+    - https://github.com/hackertwinten/clair-helm
+    - https://github.com/quay/clair
+    type: application
+    urls:
+    - https://hackertwinten.github.io/clair-helm/clair-0.3.0.tgz
+    version: 0.3.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: changed
           description: Replace operator mode with proper distributed mode (separate indexer/matcher/notifier pods)
         - kind: changed
@@ -83,4 +124,4 @@ entries:
     urls:
     - https://hackertwinten.github.io/clair-helm/clair-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-22T16:24:30.426981022Z"
+generated: "2026-05-22T16:33:47.92522276Z"
