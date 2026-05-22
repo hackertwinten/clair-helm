@@ -9,6 +9,7 @@ keywords:
   - vulnerability-scanner
   - container-security
   - security
+icon: https://raw.githubusercontent.com/hackertwinten/clair-helm/main/assets/logo.png
 home: https://github.com/hackertwinten/clair-helm
 sources:
   - https://github.com/hackertwinten/clair-helm
