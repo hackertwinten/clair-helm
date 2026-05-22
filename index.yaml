@@ -21,12 +21,11 @@ entries:
         url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
     apiVersion: v2
     appVersion: 4.7.4
-    created: "2026-05-22T17:06:01.312719022Z"
+    created: "2026-05-22T19:10:58.495697+02:00"
     description: Helm chart for Clair — container vulnerability static analysis tool
       (Quay/Red Hat)
-    digest: ecc6717b1a9999de415948c756cfe992251616f0423a28b3276f909eef2d6d3d
+    digest: 42a7a7fdab79445aabe7a4d9cff9801a7883216a472d05dc714df528a79e45f6
     home: https://github.com/hackertwinten/clair-helm
-    icon: https://raw.githubusercontent.com/hackertwinten/clair-helm/main/assets/logo.png
     keywords:
     - clair
     - vulnerability-scanner
@@ -41,88 +40,6 @@ entries:
     - https://github.com/quay/clair
     type: application
     urls:
-    - https://hackertwinten.github.io/clair-helm/clair-0.3.0.tgz
+    - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.3.0/clair-0.3.0.tgz
     version: 0.3.0
-  - annotations:
-      artifacthub.io/changes: |
-        - kind: changed
-          description: Replace operator mode with proper distributed mode (separate indexer/matcher/notifier pods)
-        - kind: changed
-          description: Rename deployment mode to combo mode matching Clair upstream terminology
-        - kind: added
-          description: Path-based Ingress for distributed mode routing traffic to each component
-      artifacthub.io/images: |
-        - name: clair
-          image: quay.io/projectquay/clair:4.7.4
-        - name: postgresql
-          image: postgres:15-alpine
-      artifacthub.io/license: Apache-2.0
-      artifacthub.io/maintainers: |
-        - name: hackertwinten
-          url: https://github.com/hackertwinten
-      artifacthub.io/signKey: |
-        fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
-        url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
-    apiVersion: v2
-    appVersion: 4.7.4
-    created: "2026-05-22T16:24:30.429155097Z"
-    description: Helm chart for Clair — container vulnerability static analysis tool
-      (Quay/Red Hat)
-    digest: 99b339116f3837874ebc40742e3822a258b5118dc012e3c4632892574b39e778
-    home: https://github.com/hackertwinten/clair-helm
-    keywords:
-    - clair
-    - vulnerability-scanner
-    - container-security
-    - security
-    maintainers:
-    - name: hackertwinten
-      url: https://github.com/hackertwinten
-    name: clair
-    sources:
-    - https://github.com/hackertwinten/clair-helm
-    - https://github.com/quay/clair
-    type: application
-    urls:
-    - https://hackertwinten.github.io/clair-helm/clair-0.2.0.tgz
-    version: 0.2.0
-  - annotations:
-      artifacthub.io/changes: |
-        - kind: added
-          description: Initial release with deployment and operator modes
-      artifacthub.io/images: |
-        - name: clair
-          image: quay.io/projectquay/clair:4.7.4
-        - name: postgresql
-          image: postgres:15-alpine
-      artifacthub.io/license: Apache-2.0
-      artifacthub.io/maintainers: |
-        - name: hackertwinten
-          url: https://github.com/hackertwinten
-      artifacthub.io/signKey: |
-        fingerprint: ""
-        url: ""
-    apiVersion: v2
-    appVersion: 4.7.4
-    created: "2026-05-22T15:48:48.692424681Z"
-    description: Helm chart for Clair — container vulnerability static analysis tool
-      (Quay/Red Hat)
-    digest: 00fa295b8fc8c0627a94b397cd2179d7515f8099a694774a2bc509ee107e9798
-    home: https://github.com/hackertwinten/clair-helm
-    keywords:
-    - clair
-    - vulnerability-scanner
-    - container-security
-    - security
-    maintainers:
-    - name: hackertwinten
-      url: https://github.com/hackertwinten
-    name: clair
-    sources:
-    - https://github.com/hackertwinten/clair-helm
-    - https://github.com/quay/clair
-    type: application
-    urls:
-    - https://hackertwinten.github.io/clair-helm/clair-0.1.0.tgz
-    version: 0.1.0
-generated: "2026-05-22T17:06:01.310430224Z"
+generated: "2026-05-22T19:10:58.49426+02:00"
