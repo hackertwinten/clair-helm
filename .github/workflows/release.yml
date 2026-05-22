@@ -69,4 +69,4 @@ jobs:
           git add index.yaml
           git diff --staged --quiet && echo "index.yaml unchanged" && exit 0
           git commit -m "Update index.yaml for ${{ steps.chart.outputs.name }}-${{ steps.chart.outputs.version }}"
-          git push origin gh-pages
+          git push origin HEAD:gh-pages
