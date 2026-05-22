@@ -70,7 +70,8 @@ jobs:
           git fetch origin gh-pages
           git worktree add /tmp/gh-pages origin/gh-pages
 
-          CHART_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}"
+          TAG="${CHART_NAME}-${CHART_VERSION}"
+          CHART_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}"
 
           if [ -f /tmp/gh-pages/index.yaml ]; then
             helm repo index .packages --url "$CHART_URL" --merge /tmp/gh-pages/index.yaml
