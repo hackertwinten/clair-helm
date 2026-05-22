@@ -2,7 +2,7 @@ apiVersion: v2
 name: clair
 description: Helm chart for Clair — container vulnerability static analysis tool (Quay/Red Hat)
 type: application
-version: 0.2.0
+version: 0.3.0
 appVersion: "4.7.4"
 keywords:
   - clair
@@ -22,12 +22,10 @@ annotations:
     fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
     url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
   artifacthub.io/changes: |
-    - kind: changed
-      description: Replace operator mode with proper distributed mode (separate indexer/matcher/notifier pods)
-    - kind: changed
-      description: Rename deployment mode to combo mode matching Clair upstream terminology
     - kind: added
-      description: Path-based Ingress for distributed mode routing traffic to each component
+      description: helm test support — health check Pods for combo and distributed modes
+    - kind: added
+      description: GPG-signed chart releases with public key published in repo
   artifacthub.io/images: |
     - name: clair
       image: quay.io/projectquay/clair:4.7.4

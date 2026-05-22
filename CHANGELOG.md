@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-22
+
+### Added
+- `helm test` support via `templates/tests/healthcheck.yaml` — health check Pods that poll `/healthz` on the introspection port for each active component
+- GPG-signed chart releases; public key published at `pubkey.asc` and referenced in ArtifactHub annotations
+
 ## [0.2.0] - 2026-05-22
 
 ### Changed
@@ -44,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for lint/test and chart release via GitHub Pages
 - ArtifactHub annotations for chart discoverability
 
-[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.2.0...HEAD
+[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.3.0...HEAD
+[0.3.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.2.0...clair-0.3.0
 [0.2.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.1.0...clair-0.2.0
 [0.1.0]: https://github.com/hackertwinten/clair-helm/releases/tag/clair-0.1.0
