@@ -21,9 +21,6 @@ Create a default fully qualified app name.
 {{- end }}
 {{- end }}
 
-{{/*
-Chart label.
-*/}}
 {{- define "clair.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
@@ -40,24 +37,31 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-{{/*
-Selector labels.
-*/}}
 {{- define "clair.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "clair.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Notifier selector labels.
+Component selector labels.
 */}}
+{{- define "clair.indexer.selectorLabels" -}}
+app.kubernetes.io/name: {{ printf "%s-indexer" (include "clair.name" .) }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{- define "clair.matcher.selectorLabels" -}}
+app.kubernetes.io/name: {{ printf "%s-matcher" (include "clair.name" .) }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
 {{- define "clair.notifier.selectorLabels" -}}
 app.kubernetes.io/name: {{ printf "%s-notifier" (include "clair.name" .) }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-ServiceAccount name for the main deployment.
+ServiceAccount name.
 */}}
 {{- define "clair.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
@@ -68,31 +72,19 @@ ServiceAccount name for the main deployment.
 {{- end }}
 
 {{/*
-ServiceAccount name for the operator.
-*/}}
-{{- define "clair.operator.serviceAccountName" -}}
-{{- if .Values.operator.serviceAccount.create }}
-{{- default (printf "%s-operator" (include "clair.fullname" .)) .Values.operator.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.operator.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-{{/*
 PostgreSQL service hostname.
 */}}
 {{- define "clair.postgresHost" -}}
 {{- if .Values.postgresql.enabled }}
 {{- printf "%s-postgresql" (include "clair.fullname" .) }}
 {{- else }}
-{{- required "database.host is required when postgresql.enabled=false and database.externalConnString is empty" .Values.database.host }}
+{{- required "database.externalConnString is required when postgresql.enabled=false" .Values.database.externalConnString }}
 {{- end }}
 {{- end }}
 
 {{/*
-Resolve the DB password: prefer existing Secret > values > auto-generate.
-Call this inside a template that already has the $secretObj available, or use
-the clair.dbPassword helper which does the lookup itself.
+Resolve the DB password: existing Secret > values override > auto-generate.
+Stable across helm upgrades via Secret lookup.
 */}}
 {{- define "clair.dbPassword" -}}
 {{- $secretName := printf "%s-db" (include "clair.fullname" .) -}}
@@ -107,8 +99,7 @@ the clair.dbPassword helper which does the lookup itself.
 {{- end }}
 
 {{/*
-Build a PostgreSQL connection string from components.
-Usage: pass a dict with keys: host, port, dbname, user, password
+PostgreSQL connection string.
 */}}
 {{- define "clair.connString" -}}
 {{- if .Values.database.externalConnString -}}
@@ -124,23 +115,29 @@ Usage: pass a dict with keys: host, port, dbname, user, password
 {{- end }}
 
 {{/*
-Resolved notifier indexer address (defaults to the main Clair service).
+Distributed mode: indexer service address.
 */}}
-{{- define "clair.notifier.indexerAddr" -}}
-{{- if .Values.notifier.config.indexerAddr -}}
-{{- .Values.notifier.config.indexerAddr -}}
-{{- else -}}
-{{- printf "http://%s:%d" (include "clair.fullname" .) (int .Values.service.port) -}}
-{{- end -}}
+{{- define "clair.indexerAddr" -}}
+{{- printf "http://%s-indexer:6060" (include "clair.fullname" .) -}}
 {{- end }}
 
 {{/*
-Resolved notifier matcher address (defaults to the main Clair service).
+Distributed mode: matcher service address.
 */}}
-{{- define "clair.notifier.matcherAddr" -}}
-{{- if .Values.notifier.config.matcherAddr -}}
-{{- .Values.notifier.config.matcherAddr -}}
-{{- else -}}
-{{- printf "http://%s:%d" (include "clair.fullname" .) (int .Values.service.port) -}}
-{{- end -}}
+{{- define "clair.matcherAddr" -}}
+{{- printf "http://%s-matcher:6060" (include "clair.fullname" .) -}}
+{{- end }}
+
+{{/*
+Combo mode: notifier indexer address — points to main combo service by default.
+*/}}
+{{- define "clair.combo.notifier.indexerAddr" -}}
+{{- printf "http://%s:6060" (include "clair.fullname" .) -}}
+{{- end }}
+
+{{/*
+Combo mode: notifier matcher address — points to main combo service by default.
+*/}}
+{{- define "clair.combo.notifier.matcherAddr" -}}
+{{- printf "http://%s:6060" (include "clair.fullname" .) -}}
 {{- end }}

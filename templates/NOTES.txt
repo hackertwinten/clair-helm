@@ -1,23 +1,22 @@
-{{- if eq .Values.mode "deployment" }}
-Clair has been deployed in DIRECT DEPLOYMENT mode.
+{{- if eq .Values.mode "combo" }}
+Clair has been deployed in COMBO mode (all-in-one process).
 
   Release:   {{ .Release.Name }}
   Namespace: {{ .Release.Namespace }}
   Image:     {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
-  Mode:      {{ .Values.config.mode }}
 
 Get the Clair API address:
-{{- if .Values.ingress.enabled }}
-{{- range .Values.ingress.hosts }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
+{{- if .Values.combo.ingress.enabled }}
+{{- range .Values.combo.ingress.hosts }}
+  http{{ if $.Values.combo.ingress.tls }}s{{ end }}://{{ .host }}
 {{- end }}
-{{- else if eq .Values.service.type "NodePort" }}
+{{- else if eq .Values.combo.service.type "NodePort" }}
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "clair.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 {{- else }}
-  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "clair.fullname" . }} 6060:{{ .Values.service.port }}
-  Then access: http://127.0.0.1:6060
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "clair.fullname" . }} {{ .Values.combo.service.port }}:{{ .Values.combo.service.port }}
+  Then access: http://127.0.0.1:{{ .Values.combo.service.port }}
 {{- end }}
 
 {{- if .Values.postgresql.enabled }}
@@ -30,45 +29,51 @@ PostgreSQL is bundled. To connect directly:
   External database: {{ .Values.database.externalConnString | default "(configure database.externalConnString)" }}
 {{- end }}
 
-{{- if .Values.notifier.enabled }}
+{{- if .Values.combo.notifier.enabled }}
 
 Notifier is running as a separate deployment:
   kubectl get deploy --namespace {{ .Release.Namespace }} {{ include "clair.fullname" . }}-notifier
 {{- end }}
 
-Check pod status:
-  kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/instance={{ .Release.Name }}"
-
-{{- else if eq .Values.mode "operator" }}
-
-Clair has been deployed in OPERATOR mode.
+{{- else if eq .Values.mode "distributed" }}
+Clair has been deployed in DISTRIBUTED mode (separate pods per component).
 
   Release:   {{ .Release.Name }}
   Namespace: {{ .Release.Namespace }}
+  Image:     {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
 
-The Clair operator is running and will reconcile ClairInstance resources.
+Components:
+  Indexer:  {{ include "clair.fullname" . }}-indexer  ({{ .Values.distributed.indexer.replicaCount }} replica(s))
+  Matcher:  {{ include "clair.fullname" . }}-matcher  ({{ .Values.distributed.matcher.replicaCount }} replica(s))
+{{- if .Values.distributed.notifier.enabled }}
+  Notifier: {{ include "clair.fullname" . }}-notifier ({{ .Values.distributed.notifier.replicaCount }} replica(s))
+{{- end }}
 
-Check the operator:
-  kubectl get deploy --namespace {{ .Release.Namespace }} {{ include "clair.fullname" . }}-operator
+{{- if .Values.distributed.ingress.enabled }}
 
-{{- if .Values.operator.instance.create }}
-A ClairInstance CR has been created:
-  kubectl get clairinstance --namespace {{ .Release.Namespace }} {{ .Values.operator.instance.name }}
-  kubectl describe clairinstance --namespace {{ .Release.Namespace }} {{ .Values.operator.instance.name }}
+API is accessible via Ingress at:
+  http{{ if .Values.distributed.ingress.tls }}s{{ end }}://{{ .Values.distributed.ingress.host }}/indexer
+  http{{ if .Values.distributed.ingress.tls }}s{{ end }}://{{ .Values.distributed.ingress.host }}/matcher
+{{- if .Values.distributed.notifier.enabled }}
+  http{{ if .Values.distributed.ingress.tls }}s{{ end }}://{{ .Values.distributed.ingress.host }}/notifier
+{{- end }}
 {{- else }}
-No ClairInstance CR was created (operator.instance.create=false).
-Create one manually:
-  kubectl apply -f - <<EOF
-  apiVersion: clair.quay.io/v1alpha1
-  kind: ClairInstance
-  metadata:
-    name: my-clair
-    namespace: {{ .Release.Namespace }}
-  spec:
-    replicas: 1
-    image: "{{ .Values.operator.instance.image }}"
-    database:
-      secretRef: "my-clair-connstring-secret"
-  EOF
+
+Port-forward individual components:
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "clair.fullname" . }}-indexer 6060:6060
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "clair.fullname" . }}-matcher 6061:6060
+{{- end }}
+
+{{- if .Values.postgresql.enabled }}
+
+PostgreSQL is bundled. To connect directly:
+  kubectl exec -it --namespace {{ .Release.Namespace }} \
+    deploy/{{ include "clair.fullname" . }}-postgresql -- \
+    psql -U {{ .Values.database.user }} {{ .Values.database.name }}
+{{- else }}
+  External database: {{ .Values.database.externalConnString | default "(configure database.externalConnString)" }}
 {{- end }}
 {{- end }}
+
+Check pod status:
+  kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/instance={{ .Release.Name }}"

@@ -1,0 +1,49 @@
+{{- if eq .Values.mode "distributed" }}
+{{- if .Values.distributed.indexer.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "clair.fullname" . }}-indexer
+  labels:
+    {{- include "clair.labels" . | nindent 4 }}
+    app.kubernetes.io/component: indexer
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "clair.fullname" . }}-indexer
+  minReplicas: {{ .Values.distributed.indexer.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.distributed.indexer.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.distributed.indexer.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}
+{{- if .Values.distributed.matcher.autoscaling.enabled }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "clair.fullname" . }}-matcher
+  labels:
+    {{- include "clair.labels" . | nindent 4 }}
+    app.kubernetes.io/component: matcher
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "clair.fullname" . }}-matcher
+  minReplicas: {{ .Values.distributed.matcher.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.distributed.matcher.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.distributed.matcher.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}
+{{- end }}

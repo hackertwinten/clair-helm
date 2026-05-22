@@ -23,30 +23,48 @@ jobs:
         with:
           version: v3.14.4
 
-      - name: Lint — default values
+      - name: Lint — combo mode (default)
         run: helm lint . --strict --values ci/default-values.yaml
 
-      - name: Lint — operator mode
-        run: helm lint . --strict --values ci/operator-values.yaml
+      - name: Lint — distributed mode
+        run: helm lint . --strict --values ci/distributed-values.yaml
 
-      - name: Template — default values
+      - name: Template — combo mode
         run: helm template clair . --values ci/default-values.yaml > /dev/null
 
-      - name: Template — operator mode
-        run: helm template clair . --values ci/operator-values.yaml > /dev/null
+      - name: Template — distributed mode
+        run: helm template clair . --values ci/distributed-values.yaml > /dev/null
 
-      - name: Template — notifier disabled
-        run: helm template clair . --set notifier.enabled=false > /dev/null
+      - name: Template — notifier disabled (combo)
+        run: helm template clair . --set combo.notifier.enabled=false > /dev/null
+
+      - name: Template — notifier disabled (distributed)
+        run: >
+          helm template clair .
+          --values ci/distributed-values.yaml
+          --set distributed.notifier.enabled=false
+          > /dev/null
 
       - name: Template — external database
-        run: |
-          helm template clair . \
-            --set postgresql.enabled=false \
-            --set database.externalConnString="host=db port=5432 dbname=clair user=clair password=test sslmode=disable" \
-            > /dev/null
+        run: >
+          helm template clair .
+          --set postgresql.enabled=false
+          --set database.externalConnString="host=db port=5432 dbname=clair user=clair password=test sslmode=disable"
+          > /dev/null
 
-      - name: Validate schema rejects bad input
-        run: |
-          ! helm template clair . --set mode=invalid 2>/dev/null
-          ! helm template clair . --set config.logLevel=invalid 2>/dev/null
-          ! helm template clair . --set replicaCount=0 2>/dev/null
+      - name: Template — autoscaling enabled (distributed)
+        run: >
+          helm template clair .
+          --values ci/distributed-values.yaml
+          --set distributed.indexer.autoscaling.enabled=true
+          --set distributed.matcher.autoscaling.enabled=true
+          > /dev/null
+
+      - name: Validate schema rejects bad mode
+        run: "! helm template clair . --set mode=invalid 2>/dev/null"
+
+      - name: Validate schema rejects bad logLevel
+        run: "! helm template clair . --set config.logLevel=invalid 2>/dev/null"
+
+      - name: Validate schema rejects zero replicas
+        run: "! helm template clair . --set combo.replicaCount=0 2>/dev/null"

@@ -1,0 +1,23 @@
+{{- if eq .Values.mode "distributed" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "clair.fullname" . }}-matcher
+  labels:
+    {{- include "clair.labels" . | nindent 4 }}
+    app.kubernetes.io/component: matcher
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "clair.matcher.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: matcher
+  ports:
+    - name: http
+      port: 6060
+      targetPort: http
+      protocol: TCP
+    - name: introspection
+      port: 8089
+      targetPort: introspection
+      protocol: TCP
+{{- end }}

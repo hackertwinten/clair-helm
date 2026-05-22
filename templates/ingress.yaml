@@ -1,24 +1,24 @@
-{{- if and (eq .Values.mode "deployment") .Values.ingress.enabled }}
+{{- if and (eq .Values.mode "combo") .Values.combo.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "clair.fullname" . }}
   labels:
     {{- include "clair.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+  {{- with .Values.combo.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.className }}
-  ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.combo.ingress.className }}
+  ingressClassName: {{ .Values.combo.ingress.className }}
   {{- end }}
-  {{- with .Values.ingress.tls }}
+  {{- with .Values.combo.ingress.tls }}
   tls:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   rules:
-    {{- range .Values.ingress.hosts }}
+    {{- range .Values.combo.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
