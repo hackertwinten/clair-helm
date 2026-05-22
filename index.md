@@ -1,0 +1,1 @@
+# clair-helm chart repository
