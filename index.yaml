@@ -3,6 +3,48 @@ entries:
   clair:
   - annotations:
       artifacthub.io/changes: |
+        - kind: changed
+          description: "combo.notifier.enabled now defaults to false — separate notifier pod requires an explicit delivery mechanism (webhook/AMQP/STOMP)"
+        - kind: changed
+          description: "config.notifier.pollInterval default raised from 5m to 6h; deliveryInterval from 1m to 1h to match Clair upstream defaults"
+      artifacthub.io/images: |
+        - name: clair
+          image: quay.io/projectquay/clair:4.9.0
+        - name: postgresql
+          image: postgres:17-alpine
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/maintainers: |
+        - name: hackertwinten
+          url: https://github.com/hackertwinten
+      artifacthub.io/signKey: |
+        fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
+        url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
+    apiVersion: v2
+    appVersion: 4.9.0
+    created: "2026-05-23T22:18:47.993954184Z"
+    description: Helm chart for Clair — container vulnerability static analysis tool
+      (Quay/Red Hat)
+    digest: 4fdd74bbb0233203045772e693ef59e1c39e72be804dc8a16f21ba0ab2f2de81
+    home: https://github.com/hackertwinten/clair-helm
+    icon: https://raw.githubusercontent.com/hackertwinten/clair-helm/main/assets/logo.png
+    keywords:
+    - clair
+    - vulnerability-scanner
+    - container-security
+    - security
+    maintainers:
+    - name: hackertwinten
+      url: https://github.com/hackertwinten
+    name: clair
+    sources:
+    - https://github.com/hackertwinten/clair-helm
+    - https://github.com/quay/clair
+    type: application
+    urls:
+    - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.11.0/clair-0.11.0.tgz
+    version: 0.11.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: "ctxlock hang when combo.notifier.enabled=true — notifier connstring was omitted from combo config, causing ctxlock to fall back to Unix socket defaults and block indefinitely"
       artifacthub.io/images: |
@@ -327,4 +369,4 @@ entries:
     urls:
     - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.3.0/clair-0.3.0.tgz
     version: 0.3.0
-generated: "2026-05-23T22:13:48.705857107Z"
+generated: "2026-05-23T22:18:47.992561264Z"
