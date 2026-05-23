@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-05-23
+
+### Fixed
+- Connstring password mismatch on first install. `clair.connString` in `_helpers.tpl` called `clair.dbPassword` independently from the `$dbPassword` variable in `secret.yaml`, causing `randAlphaNum 32` to be invoked twice and generating two different passwords. Fixed by building the connstring inline in both `secret.yaml` and `distributed/secret.yaml` using the already-computed `$dbPassword` variable.
+
 ## [0.8.0] - 2026-05-23
 
 ### Added
@@ -79,7 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for lint/test and chart release via GitHub Pages
 - ArtifactHub annotations for chart discoverability
 
-[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.8.0...HEAD
+[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.9.0...HEAD
+[0.9.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.8.0...clair-0.9.0
 [0.8.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.7.0...clair-0.8.0
 [0.7.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.6.0...clair-0.7.0
 [0.6.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.5.0...clair-0.6.0

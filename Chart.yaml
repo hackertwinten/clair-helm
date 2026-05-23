@@ -2,7 +2,7 @@ apiVersion: v2
 name: clair
 description: Helm chart for Clair — container vulnerability static analysis tool (Quay/Red Hat)
 type: application
-version: 0.8.0
+version: 0.9.0
 appVersion: "4.9.0"
 keywords:
   - clair
@@ -23,8 +23,8 @@ annotations:
     fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
     url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
   artifacthub.io/changes: |
-    - kind: added
-      description: extraEnv — inject additional environment variables into all Clair containers
+    - kind: fixed
+      description: "connstring password mismatch on first install — randAlphaNum was called twice, generating different passwords for clair-db and clair-config"
   artifacthub.io/images: |
     - name: clair
       image: quay.io/projectquay/clair:4.9.0
