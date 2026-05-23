@@ -3,6 +3,50 @@ entries:
   clair:
   - annotations:
       artifacthub.io/changes: |
+        - kind: security
+          description: Bump Clair image from 4.7.4 to 4.9.0
+        - kind: security
+          description: Bump PostgreSQL image from 15-alpine to 17-alpine
+        - kind: security
+          description: Bump busybox init container image from 1.36 to 1.37.0
+      artifacthub.io/images: |
+        - name: clair
+          image: quay.io/projectquay/clair:4.9.0
+        - name: postgresql
+          image: postgres:17-alpine
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/maintainers: |
+        - name: hackertwinten
+          url: https://github.com/hackertwinten
+      artifacthub.io/signKey: |
+        fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
+        url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
+    apiVersion: v2
+    appVersion: 4.9.0
+    created: "2026-05-23T10:13:54.829120558Z"
+    description: Helm chart for Clair — container vulnerability static analysis tool
+      (Quay/Red Hat)
+    digest: 6e7921c63b1b8bf4c451a16fbbc45f8d7701df92e7bc8c57b4b31b3d2a2c2f7a
+    home: https://github.com/hackertwinten/clair-helm
+    icon: https://raw.githubusercontent.com/hackertwinten/clair-helm/main/assets/logo.png
+    keywords:
+    - clair
+    - vulnerability-scanner
+    - container-security
+    - security
+    maintainers:
+    - name: hackertwinten
+      url: https://github.com/hackertwinten
+    name: clair
+    sources:
+    - https://github.com/hackertwinten/clair-helm
+    - https://github.com/quay/clair
+    type: application
+    urls:
+    - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.4.0/clair-0.4.0.tgz
+    version: 0.4.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: added
           description: helm test support — health check Pods for combo and distributed modes
         - kind: added
@@ -43,4 +87,4 @@ entries:
     urls:
     - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.3.0/clair-0.3.0.tgz
     version: 0.3.0
-generated: "2026-05-22T17:11:48.813050234Z"
+generated: "2026-05-23T10:13:54.827751398Z"
