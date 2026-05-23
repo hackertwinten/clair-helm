@@ -2,7 +2,7 @@ apiVersion: v2
 name: clair
 description: Helm chart for Clair — container vulnerability static analysis tool (Quay/Red Hat)
 type: application
-version: 0.6.0
+version: 0.7.0
 appVersion: "4.9.0"
 keywords:
   - clair
@@ -24,7 +24,7 @@ annotations:
     url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
   artifacthub.io/changes: |
     - kind: fixed
-      description: Replace hardcoded /clair binary path with args to respect image entrypoint (fixes Clair 4.9.0)
+      description: Fix password mismatch between PostgreSQL and Clair on first install — use clair-db as single password source
   artifacthub.io/images: |
     - name: clair
       image: quay.io/projectquay/clair:4.9.0

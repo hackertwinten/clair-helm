@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-05-23
+
+### Fixed
+- Password mismatch between PostgreSQL and Clair on first install. `randAlphaNum` was called independently from two template files producing two different passwords. Fixed by making `clair-db` the single password source — PostgreSQL now reads its password from `clair-db` via `secretKeyRef` instead of a separate `clair-postgresql` secret.
+
 ## [0.6.0] - 2026-05-23
 
 ### Fixed
@@ -69,7 +74,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for lint/test and chart release via GitHub Pages
 - ArtifactHub annotations for chart discoverability
 
-[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.6.0...HEAD
+[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.7.0...HEAD
+[0.7.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.6.0...clair-0.7.0
 [0.6.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.5.0...clair-0.6.0
 [0.5.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.4.0...clair-0.5.0
 [0.4.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.3.0...clair-0.4.0
