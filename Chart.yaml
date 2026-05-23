@@ -2,7 +2,7 @@ apiVersion: v2
 name: clair
 description: Helm chart for Clair — container vulnerability static analysis tool (Quay/Red Hat)
 type: application
-version: 0.9.0
+version: 0.10.0
 appVersion: "4.9.0"
 keywords:
   - clair
@@ -24,7 +24,7 @@ annotations:
     url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
   artifacthub.io/changes: |
     - kind: fixed
-      description: "connstring password mismatch on first install — randAlphaNum was called twice, generating different passwords for clair-db and clair-config"
+      description: "ctxlock hang when combo.notifier.enabled=true — notifier connstring was omitted from combo config, causing ctxlock to fall back to Unix socket defaults and block indefinitely"
   artifacthub.io/images: |
     - name: clair
       image: quay.io/projectquay/clair:4.9.0

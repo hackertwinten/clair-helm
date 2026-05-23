@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-05-24
+
+### Fixed
+- Clair hanging at startup when `combo.notifier.enabled: true`. The notifier `connstring` was omitted from the combo pod's config in this case, causing `ctxlock.New` to fall back to OS defaults (`user=nobody`, Unix socket) and block indefinitely. Fixed by always emitting a minimal `notifier.connstring` in the combo config — without delivery settings, Clair's notifier service gracefully self-disables via `ErrNoDelivery`.
+
 ## [0.9.0] - 2026-05-23
 
 ### Fixed
@@ -84,7 +89,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for lint/test and chart release via GitHub Pages
 - ArtifactHub annotations for chart discoverability
 
-[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.9.0...HEAD
+[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.10.0...HEAD
+[0.10.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.9.0...clair-0.10.0
 [0.9.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.8.0...clair-0.9.0
 [0.8.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.7.0...clair-0.8.0
 [0.7.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.6.0...clair-0.7.0
