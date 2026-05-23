@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-05-24
+
+### Fixed
+- Layer fetching fails with `read-only file system` when `readOnlyRootFilesystem: true`. Clair's `RemoteFetchArena` uses `/var/tmp` as its working directory by default (per [file-hierarchy(7)](https://www.freedesktop.org/software/systemd/man/file-hierarchy.html)). Added a `/var/tmp` emptyDir volume mount to the combo and distributed indexer Deployments.
+
 ## [0.11.0] - 2026-05-24
 
 ### Changed
@@ -95,7 +100,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for lint/test and chart release via GitHub Pages
 - ArtifactHub annotations for chart discoverability
 
-[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.11.0...HEAD
+[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.12.0...HEAD
+[0.12.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.11.0...clair-0.12.0
 [0.11.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.10.0...clair-0.11.0
 [0.10.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.9.0...clair-0.10.0
 [0.9.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.8.0...clair-0.9.0

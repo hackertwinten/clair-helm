@@ -2,7 +2,7 @@ apiVersion: v2
 name: clair
 description: Helm chart for Clair — container vulnerability static analysis tool (Quay/Red Hat)
 type: application
-version: 0.11.0
+version: 0.12.0
 appVersion: "4.9.0"
 keywords:
   - clair
@@ -23,10 +23,8 @@ annotations:
     fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
     url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
   artifacthub.io/changes: |
-    - kind: changed
-      description: "combo.notifier.enabled now defaults to false — separate notifier pod requires an explicit delivery mechanism (webhook/AMQP/STOMP)"
-    - kind: changed
-      description: "config.notifier.pollInterval default raised from 5m to 6h; deliveryInterval from 1m to 1h to match Clair upstream defaults"
+    - kind: fixed
+      description: "layer fetch fails with read-only file system — mount /var/tmp emptyDir on combo and indexer pods (Clair uses /var/tmp as its fetch arena)"
   artifacthub.io/images: |
     - name: clair
       image: quay.io/projectquay/clair:4.9.0

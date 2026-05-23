@@ -93,6 +93,8 @@ spec:
               readOnly: true
             - name: tmp
               mountPath: /tmp
+            - name: vartmp
+              mountPath: /var/tmp
           {{- with .Values.distributed.indexer.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
@@ -102,6 +104,8 @@ spec:
           secret:
             secretName: {{ include "clair.fullname" . }}-config
         - name: tmp
+          emptyDir: {}
+        - name: vartmp
           emptyDir: {}
       {{- with .Values.nodeSelector }}
       nodeSelector:
