@@ -16,7 +16,7 @@ spec:
     runAsUser: 65534
   containers:
     - name: healthcheck
-      image: busybox:1.36
+      image: busybox:1.37.0
       command:
         - sh
         - -c
@@ -47,7 +47,7 @@ spec:
     runAsUser: 65534
   containers:
     - name: healthcheck
-      image: busybox:1.36
+      image: busybox:1.37.0
       command:
         - sh
         - -c
@@ -78,7 +78,7 @@ spec:
     runAsUser: 65534
   containers:
     - name: healthcheck
-      image: busybox:1.36
+      image: busybox:1.37.0
       command:
         - sh
         - -c
@@ -110,7 +110,7 @@ spec:
     runAsUser: 65534
   containers:
     - name: healthcheck
-      image: busybox:1.36
+      image: busybox:1.37.0
       command:
         - sh
         - -c

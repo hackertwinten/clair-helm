@@ -14,7 +14,7 @@ image:
   # -- Clair container image repository.
   repository: quay.io/projectquay/clair
   # -- Image tag. Defaults to the chart's appVersion when empty.
-  tag: "4.7.4"
+  tag: "4.9.0"
   # -- Image pull policy.
   pullPolicy: IfNotPresent
 
@@ -136,7 +136,7 @@ postgresql:
 
   image:
     repository: postgres
-    tag: "15-alpine"
+    tag: "17-alpine"
     pullPolicy: IfNotPresent
 
   persistence:

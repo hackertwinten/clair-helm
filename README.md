@@ -242,7 +242,7 @@ config:
 | `nameOverride` | `""` | Override the chart name |
 | `fullnameOverride` | `""` | Override the full release name |
 | `image.repository` | `quay.io/projectquay/clair` | Clair image |
-| `image.tag` | `4.7.4` | Image tag (defaults to `appVersion`) |
+| `image.tag` | `4.9.0` | Image tag (defaults to `appVersion`) |
 | `config.logLevel` | `info` | Log level: `debug`, `info`, `warn`, `error` |
 | `config.indexer.migrations` | `true` | Run DB migrations on startup |
 | `config.matcher.period` | `6h` | How often to sync vulnerability data |

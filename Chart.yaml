@@ -2,8 +2,8 @@ apiVersion: v2
 name: clair
 description: Helm chart for Clair — container vulnerability static analysis tool (Quay/Red Hat)
 type: application
-version: 0.3.0
-appVersion: "4.7.4"
+version: 0.4.0
+appVersion: "4.9.0"
 keywords:
   - clair
   - vulnerability-scanner
@@ -23,15 +23,17 @@ annotations:
     fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
     url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
   artifacthub.io/changes: |
-    - kind: added
-      description: helm test support — health check Pods for combo and distributed modes
-    - kind: added
-      description: GPG-signed chart releases with public key published in repo
+    - kind: security
+      description: Bump Clair image from 4.7.4 to 4.9.0
+    - kind: security
+      description: Bump PostgreSQL image from 15-alpine to 17-alpine
+    - kind: security
+      description: Bump busybox init container image from 1.36 to 1.37.0
   artifacthub.io/images: |
     - name: clair
-      image: quay.io/projectquay/clair:4.7.4
+      image: quay.io/projectquay/clair:4.9.0
     - name: postgresql
-      image: postgres:15-alpine
+      image: postgres:17-alpine
   artifacthub.io/maintainers: |
     - name: hackertwinten
       url: https://github.com/hackertwinten

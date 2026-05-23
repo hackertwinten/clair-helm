@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-23
+
+### Security
+- Bump Clair image from `4.7.4` to `4.9.0`
+- Bump PostgreSQL image from `15-alpine` to `17-alpine`
+- Bump busybox init container image from `1.36` to `1.37.0`
+
+> **Note:** PostgreSQL 17 is a major version upgrade. Existing installations with bundled PostgreSQL will need a manual data migration before upgrading. New installations are unaffected.
+
 ## [0.3.0] - 2026-05-22
 
 ### Added
@@ -50,7 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for lint/test and chart release via GitHub Pages
 - ArtifactHub annotations for chart discoverability
 
-[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.3.0...HEAD
+[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.4.0...HEAD
+[0.4.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.3.0...clair-0.4.0
 [0.3.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.2.0...clair-0.3.0
 [0.2.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.1.0...clair-0.2.0
 [0.1.0]: https://github.com/hackertwinten/clair-helm/releases/tag/clair-0.1.0
