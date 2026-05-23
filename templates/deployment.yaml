@@ -55,7 +55,7 @@ spec:
         - name: clair
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/clair", "-conf", "/etc/clair/config.yaml"]
+          args: ["-conf", "/etc/clair/config.yaml"]
           env:
             - name: CLAIR_MODE
               value: combo

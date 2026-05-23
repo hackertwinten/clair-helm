@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-05-23
+
+### Fixed
+- Replace hardcoded `/clair` binary path with `args` to respect the image entrypoint — fixes startup crash with Clair 4.9.0 where the binary moved to `/usr/bin/clair`
+
 ## [0.5.0] - 2026-05-23
 
 ### Added
@@ -64,7 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for lint/test and chart release via GitHub Pages
 - ArtifactHub annotations for chart discoverability
 
-[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.5.0...HEAD
+[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.6.0...HEAD
+[0.6.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.5.0...clair-0.6.0
 [0.5.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.4.0...clair-0.5.0
 [0.4.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.3.0...clair-0.4.0
 [0.3.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.2.0...clair-0.3.0

@@ -2,7 +2,7 @@ apiVersion: v2
 name: clair
 description: Helm chart for Clair — container vulnerability static analysis tool (Quay/Red Hat)
 type: application
-version: 0.5.0
+version: 0.6.0
 appVersion: "4.9.0"
 keywords:
   - clair
@@ -23,8 +23,8 @@ annotations:
     fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
     url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
   artifacthub.io/changes: |
-    - kind: added
-      description: "postgresql.persistence.existingClaim — use a pre-existing PVC instead of creating one"
+    - kind: fixed
+      description: Replace hardcoded /clair binary path with args to respect image entrypoint (fixes Clair 4.9.0)
   artifacthub.io/images: |
     - name: clair
       image: quay.io/projectquay/clair:4.9.0
