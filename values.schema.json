@@ -118,6 +118,7 @@
           "additionalProperties": false,
           "properties": {
             "enabled": { "type": "boolean" },
+            "existingClaim": { "type": "string" },
             "size": { "type": "string" },
             "storageClass": { "type": "string" },
             "accessMode": { "type": "string" }

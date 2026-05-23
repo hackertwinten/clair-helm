@@ -1,4 +1,4 @@
-{{- if and (or (eq .Values.mode "combo") (eq .Values.mode "distributed")) .Values.postgresql.enabled .Values.postgresql.persistence.enabled }}
+{{- if and (or (eq .Values.mode "combo") (eq .Values.mode "distributed")) .Values.postgresql.enabled .Values.postgresql.persistence.enabled (not .Values.postgresql.persistence.existingClaim) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

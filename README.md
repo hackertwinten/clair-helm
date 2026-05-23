@@ -262,9 +262,10 @@ config:
 | Key | Default | Description |
 |---|---|---|
 | `postgresql.enabled` | `true` | Deploy bundled PostgreSQL |
-| `postgresql.image.tag` | `15-alpine` | PostgreSQL image tag |
+| `postgresql.image.tag` | `17-alpine` | PostgreSQL image tag |
 | `postgresql.persistence.enabled` | `true` | Enable PVC |
-| `postgresql.persistence.size` | `10Gi` | PVC size |
+| `postgresql.persistence.existingClaim` | `""` | Use a pre-existing PVC instead of creating one |
+| `postgresql.persistence.size` | `10Gi` | PVC size (ignored when `existingClaim` is set) |
 | `postgresql.persistence.storageClass` | `""` | Storage class (cluster default if empty) |
 
 ### Combo mode

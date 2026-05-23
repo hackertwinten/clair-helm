@@ -142,11 +142,14 @@ postgresql:
   persistence:
     # -- Enable a PersistentVolumeClaim for PostgreSQL data.
     enabled: true
-    # -- PVC size.
+    # -- Name of an existing PVC to use. When set, the chart will not create a new PVC
+    # and will use this claim instead. Requires persistence.enabled=true.
+    existingClaim: ""
+    # -- PVC size. Ignored when existingClaim is set.
     size: 10Gi
-    # -- Storage class. Uses the cluster default when empty.
+    # -- Storage class. Uses the cluster default when empty. Ignored when existingClaim is set.
     storageClass: ""
-    # -- PVC access mode.
+    # -- PVC access mode. Ignored when existingClaim is set.
     accessMode: ReadWriteOnce
 
   # -- Resource requests and limits for the PostgreSQL container.
