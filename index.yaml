@@ -4,6 +4,46 @@ entries:
   - annotations:
       artifacthub.io/changes: |
         - kind: fixed
+          description: "ctxlock hang when combo.notifier.enabled=true — notifier connstring was omitted from combo config, causing ctxlock to fall back to Unix socket defaults and block indefinitely"
+      artifacthub.io/images: |
+        - name: clair
+          image: quay.io/projectquay/clair:4.9.0
+        - name: postgresql
+          image: postgres:17-alpine
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/maintainers: |
+        - name: hackertwinten
+          url: https://github.com/hackertwinten
+      artifacthub.io/signKey: |
+        fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
+        url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
+    apiVersion: v2
+    appVersion: 4.9.0
+    created: "2026-05-23T22:13:48.707355298Z"
+    description: Helm chart for Clair — container vulnerability static analysis tool
+      (Quay/Red Hat)
+    digest: 2f88d72ab6e9b070e2d3816712581731144d6401127a82c28dec5d226e676f35
+    home: https://github.com/hackertwinten/clair-helm
+    icon: https://raw.githubusercontent.com/hackertwinten/clair-helm/main/assets/logo.png
+    keywords:
+    - clair
+    - vulnerability-scanner
+    - container-security
+    - security
+    maintainers:
+    - name: hackertwinten
+      url: https://github.com/hackertwinten
+    name: clair
+    sources:
+    - https://github.com/hackertwinten/clair-helm
+    - https://github.com/quay/clair
+    type: application
+    urls:
+    - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.10.0/clair-0.10.0.tgz
+    version: 0.10.0
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: fixed
           description: "connstring password mismatch on first install — randAlphaNum was called twice, generating different passwords for clair-db and clair-config"
       artifacthub.io/images: |
         - name: clair
@@ -287,4 +327,4 @@ entries:
     urls:
     - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.3.0/clair-0.3.0.tgz
     version: 0.3.0
-generated: "2026-05-23T12:47:18.717249222Z"
+generated: "2026-05-23T22:13:48.705857107Z"
