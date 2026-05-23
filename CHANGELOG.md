@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-05-24
+
+### Changed
+- `combo.notifier.enabled` now defaults to `false`. The separate notifier pod requires at least one delivery mechanism (webhook, AMQP, or STOMP) to be configured — without one, it fatally exits. When disabled, the notifier logic runs inside the combo process and self-disables gracefully if no delivery target is set.
+- `config.notifier.pollInterval` default changed from `5m` to `6h`; `deliveryInterval` from `1m` to `1h` to match Clair's upstream defaults and avoid lint warnings.
+
 ## [0.10.0] - 2026-05-24
 
 ### Fixed
@@ -89,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for lint/test and chart release via GitHub Pages
 - ArtifactHub annotations for chart discoverability
 
-[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.10.0...HEAD
+[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.11.0...HEAD
+[0.11.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.10.0...clair-0.11.0
 [0.10.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.9.0...clair-0.10.0
 [0.9.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.8.0...clair-0.9.0
 [0.8.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.7.0...clair-0.8.0

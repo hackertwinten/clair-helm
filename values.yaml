@@ -104,9 +104,9 @@ config:
     # -- Run database migrations on notifier startup.
     migrations: true
     # -- How often the notifier polls for new vulnerability matches.
-    pollInterval: "5m"
+    pollInterval: "6h"
     # -- How often the notifier attempts to deliver pending notifications.
-    deliveryInterval: "1m"
+    deliveryInterval: "1h"
     webhook:
       # -- Webhook target URL. Leave empty to disable webhook delivery.
       target: ""
@@ -230,10 +230,13 @@ combo:
     minAvailable: 1
 
   # -- Deploy a separate notifier pod (CLAIR_MODE=notifier).
-  # When disabled, the notifier runs inside the main combo process.
+  # Requires at least one delivery mechanism configured under config.notifier.webhook,
+  # config.notifier.amqp, or config.notifier.stomp — otherwise the pod will fail to start.
+  # When disabled, the notifier logic runs inside the main combo process but self-disables
+  # if no delivery mechanism is configured.
   notifier:
     # -- Enable the dedicated notifier Deployment.
-    enabled: true
+    enabled: false
     # -- Number of notifier replicas.
     replicaCount: 1
     # -- Resource requests and limits for the notifier container.
