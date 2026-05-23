@@ -3,6 +3,46 @@ entries:
   clair:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: "postgresql.persistence.existingClaim — use a pre-existing PVC instead of creating one"
+      artifacthub.io/images: |
+        - name: clair
+          image: quay.io/projectquay/clair:4.9.0
+        - name: postgresql
+          image: postgres:17-alpine
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/maintainers: |
+        - name: hackertwinten
+          url: https://github.com/hackertwinten
+      artifacthub.io/signKey: |
+        fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
+        url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
+    apiVersion: v2
+    appVersion: 4.9.0
+    created: "2026-05-23T10:39:57.740574869Z"
+    description: Helm chart for Clair — container vulnerability static analysis tool
+      (Quay/Red Hat)
+    digest: 641e94f0ec07f3cb6e4661e32e16ccab1c5f2e0900dcf27b19210cfde6db4be1
+    home: https://github.com/hackertwinten/clair-helm
+    icon: https://raw.githubusercontent.com/hackertwinten/clair-helm/main/assets/logo.png
+    keywords:
+    - clair
+    - vulnerability-scanner
+    - container-security
+    - security
+    maintainers:
+    - name: hackertwinten
+      url: https://github.com/hackertwinten
+    name: clair
+    sources:
+    - https://github.com/hackertwinten/clair-helm
+    - https://github.com/quay/clair
+    type: application
+    urls:
+    - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.5.0/clair-0.5.0.tgz
+    version: 0.5.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: security
           description: Bump Clair image from 4.7.4 to 4.9.0
         - kind: security
@@ -87,4 +127,4 @@ entries:
     urls:
     - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.3.0/clair-0.3.0.tgz
     version: 0.3.0
-generated: "2026-05-23T10:13:54.827751398Z"
+generated: "2026-05-23T10:39:57.739243182Z"
