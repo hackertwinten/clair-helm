@@ -48,6 +48,18 @@ securityContext:
   capabilities:
     drop: ["ALL"]
 
+# -- Extra environment variables injected into all Clair containers (combo, notifier, indexer, matcher).
+# Useful for feature flags, proxy settings, or any Clair env-based config.
+# @default -- `[]`
+extraEnv: []
+# - name: HTTP_PROXY
+#   value: "http://proxy.example.com:3128"
+# - name: MY_SECRET
+#   valueFrom:
+#     secretKeyRef:
+#       name: my-secret
+#       key: value
+
 # -- Node selector for all Clair pods.
 nodeSelector: {}
 # -- Tolerations for all Clair pods.

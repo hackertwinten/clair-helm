@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-05-23
+
+### Added
+- `extraEnv` — list of additional environment variables injected into all Clair containers (combo, notifier, indexer, matcher, distributed notifier)
+
 ## [0.7.0] - 2026-05-23
 
 ### Fixed
@@ -74,7 +79,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for lint/test and chart release via GitHub Pages
 - ArtifactHub annotations for chart discoverability
 
-[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.7.0...HEAD
+[Unreleased]: https://github.com/hackertwinten/clair-helm/compare/clair-0.8.0...HEAD
+[0.8.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.7.0...clair-0.8.0
 [0.7.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.6.0...clair-0.7.0
 [0.6.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.5.0...clair-0.6.0
 [0.5.0]: https://github.com/hackertwinten/clair-helm/compare/clair-0.4.0...clair-0.5.0

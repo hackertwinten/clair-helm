@@ -59,6 +59,9 @@ spec:
           env:
             - name: CLAIR_MODE
               value: combo
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - name: http
               containerPort: 6060
