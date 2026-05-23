@@ -3,6 +3,46 @@ entries:
   clair:
   - annotations:
       artifacthub.io/changes: |
+        - kind: added
+          description: extraEnv — inject additional environment variables into all Clair containers
+      artifacthub.io/images: |
+        - name: clair
+          image: quay.io/projectquay/clair:4.9.0
+        - name: postgresql
+          image: postgres:17-alpine
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/maintainers: |
+        - name: hackertwinten
+          url: https://github.com/hackertwinten
+      artifacthub.io/signKey: |
+        fingerprint: "1CD8C105EB50605B36F319809571634183E433BB"
+        url: "https://raw.githubusercontent.com/hackertwinten/clair-helm/main/pubkey.asc"
+    apiVersion: v2
+    appVersion: 4.9.0
+    created: "2026-05-23T12:41:25.248755627Z"
+    description: Helm chart for Clair — container vulnerability static analysis tool
+      (Quay/Red Hat)
+    digest: a77a92f4ccad4b8ff1397a1f4ed45f4fb883a8f44163e759e343307a2143cbb9
+    home: https://github.com/hackertwinten/clair-helm
+    icon: https://raw.githubusercontent.com/hackertwinten/clair-helm/main/assets/logo.png
+    keywords:
+    - clair
+    - vulnerability-scanner
+    - container-security
+    - security
+    maintainers:
+    - name: hackertwinten
+      url: https://github.com/hackertwinten
+    name: clair
+    sources:
+    - https://github.com/hackertwinten/clair-helm
+    - https://github.com/quay/clair
+    type: application
+    urls:
+    - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.8.0/clair-0.8.0.tgz
+    version: 0.8.0
+  - annotations:
+      artifacthub.io/changes: |
         - kind: fixed
           description: Fix password mismatch between PostgreSQL and Clair on first install — use clair-db as single password source
       artifacthub.io/images: |
@@ -207,4 +247,4 @@ entries:
     urls:
     - https://github.com/hackertwinten/clair-helm/releases/download/clair-0.3.0/clair-0.3.0.tgz
     version: 0.3.0
-generated: "2026-05-23T11:21:31.171971586Z"
+generated: "2026-05-23T12:41:25.24731551Z"
